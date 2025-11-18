@@ -15,5 +15,14 @@ export async function login(email, password) {
     return { error: error.message };
   }
 
-  redirect('/dashboard');
+  redirect('/admin/dashboard');
+}
+
+export async function checkAuth() {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  return session !== null;
 }
