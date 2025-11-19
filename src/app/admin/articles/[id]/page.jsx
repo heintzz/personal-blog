@@ -1,17 +1,28 @@
 import ArticleContent from '@/app/components/ArticleContent';
 import { notFound } from 'next/navigation';
+import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 async function getBlog(id) {
   try {
-    const res = await fetch(`/api/blogs/${id}`, {
-      cache: 'no-store',
+    const blog = await prisma.blog.findUnique({
+      where: { id },
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
 
-    if (!res.ok) return notFound();
+    if (!blog) {
+      return notFound();
+    }
 
-    return res.json();
+    return blog;
   } catch (error) {
     console.error('Failed to fetch blog:', error);
     return notFound();

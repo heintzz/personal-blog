@@ -1,17 +1,28 @@
 import ArticleContent from '@/app/components/ArticleContent';
 import { notFound } from 'next/navigation';
+import prisma from '@/lib/prisma';
 
 async function getBlog(id) {
+  // The `no-store` cache is implied by using Prisma directly in a dynamic component.
   try {
-    const res = await fetch(`http://localhost:3000/api/blogs/${id}`, {
-      cache: 'no-store',
+    const blog = await prisma.blog.findUnique({
+      where: { id },
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
 
-    if (!res.ok) {
+    if (!blog) {
       return notFound();
     }
 
-    return res.json();
+    // The object from Prisma is already in the correct format.
+    return blog;
   } catch (error) {
     console.error('Failed to fetch blog:', error);
     return notFound();
