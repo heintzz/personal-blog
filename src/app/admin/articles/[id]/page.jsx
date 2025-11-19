@@ -30,7 +30,7 @@ async function getBlog(id) {
 }
 
 export async function generateMetadata({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const blog = await getBlog(id);
 
   if (!blog) {
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogPage({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const blog = await getBlog(id);
 
   return (
