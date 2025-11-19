@@ -90,14 +90,6 @@ export default function BlogPage() {
     setShowFilterPanel(false);
   };
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-slate-500">Loading articles...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-white">
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
@@ -109,219 +101,224 @@ export default function BlogPage() {
           <p className="text-slate-500">where thoughts and reflections lie at one place</p>
         </div>
 
-        {/* Search + Sort + Filter Bar */}
-        <div className="flex flex-col gap-4 mb-8">
-          <div className="flex gap-3">
-            {/* Search Bar */}
-            <div className="flex-1 w-full relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search articles..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-black placeholder-slate-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black/5 transition-all"
-              />
-            </div>
-
-            {/* Sort Dropdown */}
-            <div className="relative w-fit h-[50.24px] sm:w-48">
-              <select
-                value={sortBy}
-                onChange={(e) => {
-                  setSortBy(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full h-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-black text-sm appearance-none focus:outline-none focus:border-black focus:ring-1 focus:ring-black/5 transition-all pr-10"
-              >
-                <option value="date-desc">Newest First</option>
-                <option value="date-asc">Oldest First</option>
-                <option value="title-asc">Title (A-Z)</option>
-                <option value="title-desc">Title (Z-A)</option>
-              </select>
-              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
-            </div>
-
-            {/* Filter Toggle Button */}
-            <button
-              onClick={() => setShowFilterPanel(!showFilterPanel)}
-              className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
-                showFilterPanel || selectedTags.length > 0
-                  ? 'bg-black text-white'
-                  : 'bg-white border border-slate-200 text-black hover:bg-slate-50'
-              }`}
-            >
-              <Settings className="w-4 h-4" />
-              <span className="text-sm">Filter</span>
-              {selectedTags.length > 0 && (
-                <span className="ml-1 text-xs bg-white/20 px-2 py-0.5 rounded-full">
-                  {selectedTags.length}
-                </span>
-              )}
-            </button>
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-slate-500">Loading articles...</p>
           </div>
+        ) : (
+          <>
+            {' '}
+            <div className="flex flex-col gap-4 mb-8">
+              <div className="flex gap-3">
+                {/* Search Bar */}
+                <div className="flex-1 w-full relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search articles..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-black placeholder-slate-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black/5 transition-all"
+                  />
+                </div>
 
-          {/* Collapsible Filter Panel */}
-          {showFilterPanel && (
-            <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium text-black">Filter by Tags</h3>
+                {/* Sort Dropdown */}
+                <div className="relative w-fit h-[50.24px] sm:w-48">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full h-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-black text-sm appearance-none focus:outline-none focus:border-black focus:ring-1 focus:ring-black/5 transition-all pr-10"
+                  >
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                  </select>
+                  <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
+                </div>
+
+                {/* Filter Toggle Button */}
                 <button
-                  onClick={() => setShowFilterPanel(false)}
-                  className="p-1 hover:bg-slate-100 rounded transition-colors"
+                  onClick={() => setShowFilterPanel(!showFilterPanel)}
+                  className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
+                    showFilterPanel || selectedTags.length > 0
+                      ? 'bg-black text-white'
+                      : 'bg-white border border-slate-200 text-black hover:bg-slate-50'
+                  }`}
                 >
-                  <X className="w-4 h-4 text-slate-400" />
+                  <Settings className="w-4 h-4" />
+                  <span className="text-sm">Filter</span>
+                  {selectedTags.length > 0 && (
+                    <span className="ml-1 text-xs bg-white/20 px-2 py-0.5 rounded-full">
+                      {selectedTags.length}
+                    </span>
+                  )}
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
-                {allTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      selectedTags.includes(tag)
-                        ? 'bg-black text-white shadow-md'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
+              {/* Collapsible Filter Panel */}
+              {showFilterPanel && (
+                <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-medium text-black">Filter by Tags</h3>
+                    <button
+                      onClick={() => setShowFilterPanel(false)}
+                      className="p-1 hover:bg-slate-100 rounded transition-colors"
+                    >
+                      <X className="w-4 h-4 text-slate-400" />
+                    </button>
+                  </div>
 
-              {/* Active Tags Display */}
-              {selectedTags.length > 0 && (
-                <div className="pt-4 border-t border-slate-200">
-                  <p className="text-xs text-slate-600 mb-3 font-medium">Active filters:</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedTags.map((tag) => (
-                      <div
+                    {allTags.map((tag) => (
+                      <button
                         key={tag}
-                        className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full text-sm"
+                        onClick={() => toggleTag(tag)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                          selectedTags.includes(tag)
+                            ? 'bg-black text-white shadow-md'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
                       >
-                        <span className="text-black font-medium">{tag}</span>
-                        <button
-                          onClick={() => removeTag(tag)}
-                          className="hover:text-red-600 transition-colors"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                        {tag}
+                      </button>
                     ))}
                   </div>
-                  <button
-                    onClick={handleClearAllFilters}
-                    className="w-full px-3 py-2 text-sm font-medium text-slate-600 hover:text-black hover:bg-slate-100 rounded-lg transition-all"
-                  >
-                    Clear all filters
-                  </button>
+
+                  {/* Active Tags Display */}
+                  {selectedTags.length > 0 && (
+                    <div className="pt-4 border-t border-slate-200">
+                      <p className="text-xs text-slate-600 mb-3 font-medium">Active filters:</p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {selectedTags.map((tag) => (
+                          <div
+                            key={tag}
+                            className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full text-sm"
+                          >
+                            <span className="text-black font-medium">{tag}</span>
+                            <button
+                              onClick={() => removeTag(tag)}
+                              className="hover:text-red-600 transition-colors"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        onClick={handleClearAllFilters}
+                        className="w-full px-3 py-2 text-sm font-medium text-slate-600 hover:text-black hover:bg-slate-100 rounded-lg transition-all"
+                      >
+                        Clear all filters
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
+            {/* Results Info */}
+            <div className="mb-6 text-sm text-slate-600">
+              Showing {paginatedBlogs.length > 0 ? startIdx + 1 : 0} to{' '}
+              {Math.min(startIdx + itemsPerPage, filteredBlogs.length)} of {filteredBlogs.length}{' '}
+              {filteredBlogs.length <= 1 ? 'blog' : 'blogs'}
+            </div>
+            {/* Blogs Grid */}
+            {paginatedBlogs.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {paginatedBlogs.map((blog) => (
+                  <div
+                    key={blog.id}
+                    onClick={() => router.push(`/blogs/${blog.id}`)}
+                    className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-slate-300 transition-all p-6 flex flex-col group cursor-pointer"
+                  >
+                    <div className="mb-4 flex-1">
+                      <h3 className="text-lg font-semibold text-black mb-3 group-hover:text-slate-700 transition-colors line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      <img
+                        src={blog.imageUrl}
+                        className="rounded-md my-3 object-cover h-40 md:h-60"
+                      ></img>
+                      <p className="text-sm text-slate-600 line-clamp-3">{blog.description}</p>
+                    </div>
 
-        {/* Results Info */}
-        <div className="mb-6 text-sm text-slate-600">
-          Showing {paginatedBlogs.length > 0 ? startIdx + 1 : 0} to{' '}
-          {Math.min(startIdx + itemsPerPage, filteredBlogs.length)} of {filteredBlogs.length}{' '}
-          {filteredBlogs.length <= 1 ? 'blog' : 'blogs'}
-        </div>
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {blog.tags.map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full hover:bg-slate-200 transition-colors"
+                        >
+                          {tag.name}
+                        </span>
+                      ))}
+                    </div>
 
-        {/* Blogs Grid */}
-        {paginatedBlogs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {paginatedBlogs.map((blog) => (
-              <div
-                key={blog.id}
-                onClick={() => router.push(`/blogs/${blog.id}`)}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-slate-300 transition-all p-6 flex flex-col group cursor-pointer"
-              >
-                <div className="mb-4 flex-1">
-                  <h3 className="text-lg font-semibold text-black mb-3 group-hover:text-slate-700 transition-colors line-clamp-2">
-                    {blog.title}
-                  </h3>
-                  <img
-                    src={blog.imageUrl}
-                    className="rounded-md my-3 object-cover h-40 md:h-60"
-                  ></img>
-                  <p className="text-sm text-slate-600 line-clamp-3">{blog.description}</p>
-                </div>
+                    {/* Date */}
+                    <p className="text-xs text-slate-500">
+                      {new Date(blog.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-slate-500 mb-4">No articles found matching your filters.</p>
+                <button
+                  onClick={handleClearAllFilters}
+                  className="px-4 py-2 text-sm font-medium text-black hover:bg-slate-100 rounded-lg transition-all"
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft className="w-5 h-5 text-black" />
+                </button>
 
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {blog.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full hover:bg-slate-200 transition-colors"
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-lg font-medium text-sm transition-all ${
+                        currentPage === page
+                          ? 'bg-black text-white'
+                          : 'border border-slate-200 text-black hover:bg-slate-100'
+                      }`}
                     >
-                      {tag.name}
-                    </span>
+                      {page}
+                    </button>
                   ))}
                 </div>
 
-                {/* Date */}
-                <p className="text-xs text-slate-500">
-                  {new Date(blog.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <p className="text-slate-500 mb-4">No articles found matching your filters.</p>
-            <button
-              onClick={handleClearAllFilters}
-              className="px-4 py-2 text-sm font-medium text-black hover:bg-slate-100 rounded-lg transition-all"
-            >
-              Clear filters
-            </button>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft className="w-5 h-5 text-black" />
-            </button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 rounded-lg font-medium text-sm transition-all ${
-                    currentPage === page
-                      ? 'bg-black text-white'
-                      : 'border border-slate-200 text-black hover:bg-slate-100'
-                  }`}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  {page}
+                  <ChevronRight className="w-5 h-5 text-black" />
                 </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight className="w-5 h-5 text-black" />
-            </button>
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
