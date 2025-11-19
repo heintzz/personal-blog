@@ -1,8 +1,7 @@
-// middleware.ts (create this in root of your project)
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
-export async function middleware(request) {
+export async function proxy(request) {
   let response = NextResponse.next({
     request,
   });
@@ -35,7 +34,7 @@ export async function middleware(request) {
 
   // If user is not logged in and trying to access admin routes, redirect to login
   if (!user && request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/auth/login', request.url));
   }
 
   return response;
