@@ -12,17 +12,23 @@ export default function BlogPage() {
   const [sortBy, setSortBy] = useState('date-desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const itemsPerPage = 6;
 
   useEffect(() => {
-    (async () => {
-      await fetch('/api/blogs?status=PUBLISHED')
-        .then((res) => res.json())
-        .then((data) => {
-          setBlogs(data);
-        })
-        .catch((err) => console.error(err));
-    })();
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch('/api/blogs?status=PUBLISHED', { cache: 'no-store' });
+        const data = await res.json();
+        setBlogs(data);
+      } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
   }, []);
 
   // Get all unique tags
@@ -83,6 +89,14 @@ export default function BlogPage() {
     setCurrentPage(1);
     setShowFilterPanel(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-slate-500">Loading articles...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-white">

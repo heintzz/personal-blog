@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Plus, Search, Settings, X } from 'lucide-rea
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { fi } from 'zod/v4/locales';
 
 export default function AdminArticlesPage() {
   const router = useRouter();
@@ -15,17 +16,23 @@ export default function AdminArticlesPage() {
   const [sortBy, setSortBy] = useState('date-desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const itemsPerPage = 6;
 
   useEffect(() => {
-    (async () => {
-      await fetch('/api/blogs')
-        .then((res) => res.json())
-        .then((data) => {
-          setBlogs(data);
-        })
-        .catch((err) => console.error(err));
-    })();
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch('/api/blogs', { cache: 'no-store' });
+        const data = await res.json();
+        setBlogs(data);
+      } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
   }, []);
 
   // Get all unique tags
@@ -106,6 +113,14 @@ export default function AdminArticlesPage() {
   };
 
   const totalActiveFilters = selectedTags.length + selectedStatus.length;
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-slate-500">Loading articles...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-auto">
