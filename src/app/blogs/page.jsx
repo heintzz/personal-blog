@@ -102,7 +102,7 @@ export default function BlogPage() {
         </div>
 
         {loading ? (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="grid place-items-center py-32">
             <p className="text-slate-500">Loading articles...</p>
           </div>
         ) : (
@@ -262,7 +262,7 @@ export default function BlogPage() {
 
                     {/* Date */}
                     <p className="text-xs text-slate-500">
-                      {new Date(blog.createdAt).toLocaleDateString('en-US', {
+                      {new Date(blog.publishedAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
