@@ -1,74 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Search, ChevronRight, Settings, X } from 'lucide-react';
-
-const SAMPLE_PROJECTS = [
-  {
-    id: 1,
-    title: 'Building a Real-time Chat App',
-    description:
-      'Learn how to create a scalable chat application using WebSockets and React for real-time communication.',
-    tags: ['React', 'WebSocket', 'Backend'],
-    date: '2024-01-15',
-  },
-  {
-    id: 2,
-    title: 'Mastering CSS Grid Layouts',
-    description:
-      'Deep dive into CSS Grid with practical examples and advanced techniques for responsive design.',
-    tags: ['CSS', 'Frontend', 'Design'],
-    date: '2024-01-10',
-  },
-  {
-    id: 3,
-    title: 'Authentication Best Practices',
-    description:
-      'Explore secure authentication methods including JWT, OAuth, and session management strategies.',
-    tags: ['Security', 'Backend', 'Auth'],
-    date: '2024-01-08',
-  },
-  {
-    id: 4,
-    title: 'React Performance Optimization',
-    description:
-      'Optimize your React applications with memoization, code splitting, and lazy loading techniques.',
-    tags: ['React', 'Performance', 'Frontend'],
-    date: '2024-01-05',
-  },
-  {
-    id: 5,
-    title: 'Database Design Fundamentals',
-    description:
-      'Master relational database design principles, normalization, and query optimization.',
-    tags: ['Database', 'Backend', 'SQL'],
-    date: '2024-01-01',
-  },
-  {
-    id: 6,
-    title: 'Mobile-First Responsive Design',
-    description: 'Create mobile-friendly websites that adapt seamlessly across all device sizes.',
-    tags: ['CSS', 'Frontend', 'Design'],
-    date: '2023-12-28',
-  },
-  {
-    id: 7,
-    title: 'GraphQL vs REST APIs',
-    description: 'Compare GraphQL and REST APIs with practical examples and use case scenarios.',
-    tags: ['API', 'Backend', 'GraphQL'],
-    date: '2023-12-25',
-  },
-  {
-    id: 8,
-    title: 'Testing React Components',
-    description:
-      'Write comprehensive unit and integration tests for React applications using Jest and Testing Library.',
-    tags: ['React', 'Testing', 'Frontend'],
-    date: '2023-12-20',
-  },
-];
+import { ChevronLeft, ChevronRight, Search, Settings, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function BlogPage() {
+  const router = useRouter();
+  const [blogs, setBlogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortBy, setSortBy] = useState('date-desc');
@@ -76,27 +14,42 @@ export default function BlogPage() {
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const itemsPerPage = 6;
 
+  useEffect(() => {
+    (async () => {
+      await fetch('/api/blogs?status=PUBLISHED')
+        .then((res) => res.json())
+        .then((data) => {
+          setBlogs(data);
+        })
+        .catch((err) => console.error(err));
+    })();
+  }, []);
+
   // Get all unique tags
-  const allTags = [...new Set(SAMPLE_PROJECTS.flatMap((p) => p.tags))].sort();
+  const allTags = useMemo(
+    () => [...new Set(blogs.flatMap((p) => p.tags.map((p) => p.name)))].sort(),
+    [blogs]
+  );
 
   // Filter and search
-  const filteredProjects = useMemo(() => {
-    let filtered = SAMPLE_PROJECTS.filter((project) => {
+  const filteredBlogs = useMemo(() => {
+    let filtered = blogs.filter((blog) => {
       const matchesSearch =
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase());
+        blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        blog.description.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesTags =
-        selectedTags.length === 0 || selectedTags.some((tag) => project.tags.includes(tag));
+        selectedTags.length === 0 ||
+        selectedTags.some((tag) => blog.tags.map((tag) => tag.name).includes(tag));
 
       return matchesSearch && matchesTags;
     });
 
     // Sort
     if (sortBy === 'date-desc') {
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sortBy === 'date-asc') {
-      filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+      filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     } else if (sortBy === 'title-asc') {
       filtered.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortBy === 'title-desc') {
@@ -104,12 +57,12 @@ export default function BlogPage() {
     }
 
     return filtered;
-  }, [searchTerm, selectedTags, sortBy]);
+  }, [searchTerm, selectedTags, sortBy, blogs]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
   const startIdx = (currentPage - 1) * itemsPerPage;
-  const paginatedProjects = filteredProjects.slice(startIdx, startIdx + itemsPerPage);
+  const paginatedBlogs = filteredBlogs.slice(startIdx, startIdx + itemsPerPage);
 
   const toggleTag = (tag) => {
     setSelectedTags((prev) =>
@@ -133,13 +86,13 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-white">
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-4xl md:text-5xl font-light tracking-tight text-black mb-2">
-            Blog & Projects
+            Welcome to Hasnan's Blog
           </h1>
-          <p className="text-slate-500">Explore articles, tutorials, and project showcases</p>
+          <p className="text-slate-500">where thoughts and reflections lie at one place</p>
         </div>
 
         {/* Search + Sort + Filter Bar */}
@@ -260,41 +213,46 @@ export default function BlogPage() {
 
         {/* Results Info */}
         <div className="mb-6 text-sm text-slate-600">
-          Showing {paginatedProjects.length > 0 ? startIdx + 1 : 0} to{' '}
-          {Math.min(startIdx + itemsPerPage, filteredProjects.length)} of {filteredProjects.length}{' '}
-          blogs
+          Showing {paginatedBlogs.length > 0 ? startIdx + 1 : 0} to{' '}
+          {Math.min(startIdx + itemsPerPage, filteredBlogs.length)} of {filteredBlogs.length}{' '}
+          {filteredBlogs.length <= 1 ? 'blog' : 'blogs'}
         </div>
 
-        {/* Projects Grid */}
-        {paginatedProjects.length > 0 ? (
+        {/* Blogs Grid */}
+        {paginatedBlogs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {paginatedProjects.map((project) => (
+            {paginatedBlogs.map((blog) => (
               <div
-                key={project.id}
+                key={blog.id}
+                onClick={() => router.push(`/blogs/${blog.id}`)}
                 className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-slate-300 transition-all p-6 flex flex-col group cursor-pointer"
               >
                 <div className="mb-4 flex-1">
                   <h3 className="text-lg font-semibold text-black mb-3 group-hover:text-slate-700 transition-colors line-clamp-2">
-                    {project.title}
+                    {blog.title}
                   </h3>
-                  <p className="text-sm text-slate-600 line-clamp-3">{project.description}</p>
+                  <img
+                    src={blog.imageUrl}
+                    className="rounded-md my-3 object-cover h-40 md:h-60"
+                  ></img>
+                  <p className="text-sm text-slate-600 line-clamp-3">{blog.description}</p>
                 </div>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag) => (
+                  {blog.tags.map((tag) => (
                     <span
-                      key={tag}
+                      key={tag.id}
                       className="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full hover:bg-slate-200 transition-colors"
                     >
-                      {tag}
+                      {tag.name}
                     </span>
                   ))}
                 </div>
 
                 {/* Date */}
                 <p className="text-xs text-slate-500">
-                  {new Date(project.date).toLocaleDateString('en-US', {
+                  {new Date(blog.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
@@ -323,7 +281,7 @@ export default function BlogPage() {
               disabled={currentPage === 1}
               className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronRight className="w-5 h-5 text-black -rotate-90" />
+              <ChevronLeft className="w-5 h-5 text-black" />
             </button>
 
             <div className="flex items-center gap-1">
@@ -347,7 +305,7 @@ export default function BlogPage() {
               disabled={currentPage === totalPages}
               className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronRight className="w-5 h-5 text-black rotate-90" />
+              <ChevronRight className="w-5 h-5 text-black" />
             </button>
           </div>
         )}
