@@ -31,6 +31,7 @@ export default function AddBlogPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -46,7 +47,6 @@ export default function AddBlogPage() {
     };
     fetchTags();
   }, []);
-  console.log(tagsList);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -113,6 +113,36 @@ export default function AddBlogPage() {
         .finally(() => {
           setUploading(false);
         });
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    if (!content) {
+      setError('Please write some content first to generate a summary.');
+      return;
+    }
+    setIsSummarizing(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/gemini/summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setDescription(data.summary);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to generate summary.');
+      }
+    } catch (error) {
+      setError('An unexpected error occurred while generating the summary.');
+    } finally {
+      setIsSummarizing(false);
     }
   };
 
@@ -241,12 +271,29 @@ export default function AddBlogPage() {
 
             {/* Description Field */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-              <label className="block text-sm font-medium text-black mb-3">Short Description</label>
+              <div className="flex justify-between items-center mb-3">
+                <label className="block text-sm font-medium text-black">Short Description</label>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={handleGenerateSummary}
+                  disabled={isSummarizing || !content}
+                  className="px-3 py-1 text-xs font-medium text-white bg-black rounded-md hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSummarizing ? 'Generating...' : '✨ Generate with AI'}
+                </button>
+                {!content && (
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-max">
+                    Write content in the Article Content editor to enable AI summary generation.
+                  </span>
+                )}
+              </div>
+              </div>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Brief description of your article"
-                disabled={loading}
+                disabled={loading || isSummarizing}
                 rows={3}
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-black placeholder-slate-400 text-sm transition-all focus:outline-none focus:bg-white focus:border-black focus:ring-1 focus:ring-black/5 disabled:opacity-50 resize-none"
               />
