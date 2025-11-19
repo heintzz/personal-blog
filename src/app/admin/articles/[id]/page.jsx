@@ -1,15 +1,15 @@
 import ArticleContent from '@/app/components/ArticleContent';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 async function getBlog(id) {
   try {
-    const res = await fetch(`http://localhost:3000/api/blogs/${id}`, {
+    const res = await fetch(`/api/blogs/${id}`, {
       cache: 'no-store',
     });
 
-    if (!res.ok) {
-      return notFound();
-    }
+    if (!res.ok) return notFound();
 
     return res.json();
   } catch (error) {
@@ -19,13 +19,11 @@ async function getBlog(id) {
 }
 
 export async function generateMetadata({ params }) {
-  const { id } = await params;
+  const { id } = params;
   const blog = await getBlog(id);
 
   if (!blog) {
-    return {
-      title: 'Article not found',
-    };
+    return { title: 'Article not found' };
   }
 
   return {
@@ -35,7 +33,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogPage({ params }) {
-  const { id } = await params;
+  const { id } = params;
   const blog = await getBlog(id);
 
   return (
