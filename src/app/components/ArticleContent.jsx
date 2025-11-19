@@ -2,14 +2,46 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export default function ArticleContent({ blog, isAdmin = true }) {
+  const [displayDate, setDisplayDate] = useState('');
+  const [readingTime, setReadingTime] = useState(0);
+  const [publishedDate, setPublishedDate] = useState('');
+
+  useEffect(() => {
+    const dateToFormat = isAdmin ? blog.createdAt : blog.publishedAt;
+    if (dateToFormat) {
+      setDisplayDate(
+        new Date(dateToFormat).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      );
+    }
+
+    if (blog.publishedAt) {
+      setPublishedDate(
+        new Date(blog.publishedAt).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      );
+    }
+
+    if (blog.content) {
+      setReadingTime(Math.ceil(blog.content.split(' ').length / 200));
+    }
+  }, [blog, isAdmin]);
+
   return (
     <article className="max-w-7xl mx-auto px-4 py-12 md:py-16">
       {/* Header */}
       <header className="mb-10 md:mb-14">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
+        <div className="w-full mb-6 flex justify-between">
+          <div className="max-w-[85%]">
             <h1 className="text-4xl md:text-5xl font-light tracking-tight text-black mb-4">
               {blog.title}
             </h1>
@@ -26,15 +58,13 @@ export default function ArticleContent({ blog, isAdmin = true }) {
 
         {/* Meta Information */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 border-t border-slate-200 pt-6">
-          <time dateTime={isAdmin ? blog.createdAt : blog.publishedAt}>
-            {new Date(isAdmin ? blog.createdAt : blog.publishedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </time>
-          <span>•</span>
-          <span>{Math.ceil(blog.content.split(' ').length / 200)} min read</span>
+          <span>{displayDate}</span>
+          {readingTime > 0 && (
+            <>
+              <span>•</span>
+              <span>{readingTime} min read</span>
+            </>
+          )}
           {blog.tags && blog.tags.length > 0 && (
             <>
               <span>•</span>
@@ -75,13 +105,7 @@ export default function ArticleContent({ blog, isAdmin = true }) {
             <div>
               <p className="text-sm text-slate-600">Published on</p>
               {blog.publishedAt ? (
-                <p className="text-black font-medium">
-                  {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
+                <p className="text-black font-medium">{publishedDate}</p>
               ) : (
                 <p>Not published</p>
               )}
