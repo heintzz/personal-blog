@@ -338,7 +338,9 @@ When an article is created or updated, the `/api/gemini/summarize` endpoint proc
 
 ## Live Demo
 
-🚀 **Visit the deployed application:** [https://heintzz-blog.vercel.app](https://heintzz-blog.vercel.app)
+🚀 **Visit the deployed application:**  
+[GUEST] - [https://heintzz-blog.vercel.app](https://heintzz-blog.vercel.app)  
+[ADMIN] - [https://heintzz-blog.vercel.app/auth/login](https://heintzz-blog.vercel.app/auth/login)
 
 ---
 
